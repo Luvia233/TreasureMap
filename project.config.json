@@ -1,0 +1,21 @@
+{
+  "description": "温馨家居物品定位小程序项目配置",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": true,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "2.25.0",
+  "appid": "YOUR_APPID",
+  "projectname": "温馨家居物品定位小程序",
+  "cloudfunctionTemplateRoot": "cloudfunctions/",
+  "condition": {}
+}

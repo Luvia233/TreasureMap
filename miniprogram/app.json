@@ -1,0 +1,53 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/createFamily/createFamily",
+    "pages/joinFamily/joinFamily",
+    "pages/index/index",
+    "pages/search/search",
+    "pages/add/add",
+    "pages/detail/detail",
+    "pages/edit/edit",
+    "pages/family/family"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fcb69f",
+    "navigationBarTitleText": "温馨家居",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#8b7355",
+    "selectedColor": "#fcb69f",
+    "backgroundColor": "#fffaf5",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "text": "搜索",
+        "iconPath": "images/search.png",
+        "selectedIconPath": "images/search-active.png"
+      },
+      {
+        "pagePath": "pages/add/add",
+        "text": "添加",
+        "iconPath": "images/add.png",
+        "selectedIconPath": "images/add-active.png"
+      },
+      {
+        "pagePath": "pages/family/family",
+        "text": "家庭",
+        "iconPath": "images/family.png",
+        "selectedIconPath": "images/family-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
