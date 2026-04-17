@@ -1,0 +1,18 @@
+.join-family-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fffaf5 0%, #ffecd2 100%);
+  padding: 40rpx 30rpx;
+}
+
+.invite-code-input {
+  letter-spacing: 8rpx;
+  font-weight: 700;
+  font-size: 36rpx;
+  text-align: center;
+}
+
+.link-text {
+  color: #fcb69f;
+  font-weight: 600;
+  margin-left: 8rpx;
+}

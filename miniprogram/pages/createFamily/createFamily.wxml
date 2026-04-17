@@ -1,0 +1,30 @@
+<view class="create-family-page">
+  <view class="page-header">
+    <text class="page-title">创建家庭</text>
+    <text class="page-desc">创建一个新的家庭空间，邀请家人一起管理物品</text>
+  </view>
+
+  <view class="form-container">
+    <view class="form-group">
+      <text class="label">🏠 家庭名称</text>
+      <input class="input" type="text" placeholder="请输入家庭名称"
+        value="{{familyName}}" bindinput="onFamilyNameInput" maxlength="20"/>
+      <text class="input-hint">例如：我的家、张家、李府等</text>
+    </view>
+
+    <view class="form-group">
+      <text class="label">👤 您的称呼</text>
+      <input class="input" type="text" placeholder="请输入您在家庭中的称呼"
+        value="{{nickname}}" bindinput="onNicknameInput" maxlength="10"/>
+      <text class="input-hint">例如：爸爸、妈妈、张三等</text>
+    </view>
+
+    <button class="btn btn-primary submit-btn" bindtap="onCreateFamily" loading="{{isLoading}}">
+      创建家庭
+    </button>
+  </view>
+
+  <view class="page-footer">
+    <text class="footer-text">创建后将自动生成邀请码，可分享给家人</text>
+  </view>
+</view>

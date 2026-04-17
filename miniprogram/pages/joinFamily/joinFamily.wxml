@@ -1,0 +1,31 @@
+<view class="join-family-page">
+  <view class="page-header">
+    <text class="page-title">加入家庭</text>
+    <text class="page-desc">输入家人分享的邀请码，加入已有家庭</text>
+  </view>
+
+  <view class="form-container">
+    <view class="form-group">
+      <text class="label">🔑 邀请码</text>
+      <input class="input invite-code-input" type="text" placeholder="请输入8位邀请码"
+        value="{{inviteCode}}" bindinput="onInviteCodeInput" maxlength="10" disabled="{{isLoading}}"/>
+      <text class="input-hint">邀请码由家人从家庭页面分享获得</text>
+    </view>
+
+    <view class="form-group">
+      <text class="label">👤 您的称呼</text>
+      <input class="input" type="text" placeholder="请输入您在家庭中的称呼"
+        value="{{nickname}}" bindinput="onNicknameInput" maxlength="10" disabled="{{isLoading}}"/>
+      <text class="input-hint">例如：爸爸、妈妈、李四等</text>
+    </view>
+
+    <button class="btn btn-primary submit-btn" bindtap="onJoinFamily" loading="{{isLoading}}">
+      加入家庭
+    </button>
+  </view>
+
+  <view class="page-footer">
+    <text class="footer-text">没有邀请码？</text>
+    <text class="link-text" bindtap="onCreateFamily">创建新家庭</text>
+  </view>
+</view>
