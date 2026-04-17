@@ -1,0 +1,72 @@
+<view class="search-page">
+  <view class="search-header">
+    <view class="search-input-container">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" type="text" placeholder="搜索物品名称..."
+        value="{{keyword}}" bindinput="onInput" bindconfirm="onSearch" confirm-type="search"/>
+      <text class="voice-icon" bindtap="onVoiceSearch">🎤</text>
+      <text wx:if="{{keyword}}" class="clear-icon" bindtap="onClear">×</text>
+    </view>
+  </view>
+
+  <view wx:if="{{!hasSearched}}" class="search-suggestions">
+    <view class="section-title">
+      <text class="section-icon">🔥</text>
+      <text class="section-text">热门空间</text>
+    </view>
+    <view class="suggestion-tags">
+      <block wx:for="{{hotSpaces}}" wx:key="*this">
+        <view class="suggestion-tag" bindtap="onTagTap" data-keyword="{{item}}">
+          {{item}}
+        </view>
+      </block>
+    </view>
+
+    <view class="section-title">
+      <text class="section-icon">📁</text>
+      <text class="section-text">物品分类</text>
+    </view>
+    <view class="suggestion-tags">
+      <block wx:for="{{categories}}" wx:key="*this">
+        <view class="suggestion-tag" bindtap="onTagTap" data-keyword="{{item}}">
+          {{item}}
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view wx:if="{{hasSearched}}" class="search-results">
+    <view wx:if="{{results.length > 0}}" class="results-list">
+      <block wx:for="{{results}}" wx:key="_id">
+        <view class="result-item card" bindtap="onItemTap" data-id="{{item._id}}">
+          <view class="item-photo" wx:if="{{item.photoUrl}}">
+            <image src="{{item.photoUrl}}" mode="aspectFill"/>
+          </view>
+          <view class="item-info">
+            <text class="item-name">{{item.name}}</text>
+            <view class="item-location">
+              <text class="location-text">{{item.space}}</text>
+              <text wx:if="{{item.container}}" class="location-divider">/</text>
+              <text wx:if="{{item.container}}" class="location-text">{{item.container}}</text>
+              <text wx:if="{{item.position}}" class="location-divider">/</text>
+              <text wx:if="{{item.position}}" class="location-text">{{item.position}}</text>
+            </view>
+            <view wx:if="{{item.category}}" class="item-category">
+              <text class="category-tag">{{item.category}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view wx:if="{{results.length === 0 && !isLoading}}" class="empty-state">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">没有找到相关物品</text>
+      <text class="empty-hint">试试其他关键词</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isLoading}}" class="loading-state">
+    <text class="loading-text">搜索中...</text>
+  </view>
+</view>
