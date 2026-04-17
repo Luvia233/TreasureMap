@@ -1,4 +1,4 @@
-# 温馨家居 - 物品定位小程序 | NeverForget - Item Locator Mini Program
+# TreasureMap - 宝藏地图 | 家庭物品定位小程序
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![WeChat](https://img.shields.io/badge/WeChat-Mini%20Program-green.svg)](https://developers.weixin.qq.com/miniprogram/dev/framework/)
@@ -9,7 +9,7 @@
 
 ### 项目简介
 
-**温馨家居**是一款微信小程序，帮助家庭用户轻松记录和管理家中物品的放置位置。支持手动/语音输入、按空间浏览、全文搜索、家庭共享等功能，让找东西不再困难。
+**TreasureMap（宝藏地图）**是一款微信小程序，帮助家庭用户轻松记录和管理家中物品的放置位置。就像一张家庭宝藏地图，让你快速找到每件"宝藏"的藏身之处！支持手动/语音输入、按空间浏览、全文搜索、家庭共享等功能。
 
 ### ✨ 功能特性
 
@@ -33,7 +33,7 @@
 ### 📁 项目结构
 
 ```
-neverforget/
+treasuremap/
 ├── miniprogram/                # 小程序主体
 │   ├── pages/                  # 页面
 │   │   ├── login/              # 登录页
@@ -79,7 +79,7 @@ git clone https://github.com/Luvia233/neverForget.git
 
 1. 下载并安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
 2. 打开微信开发者工具，选择"导入项目"
-3. 选择项目目录 `neverforget`
+3. 选择项目目录 `treasuremap`
 4. 填写你的 AppID（可在[微信公众平台](https://mp.weixin.qq.com/)获取）
 
 #### 3. 配置云开发
@@ -138,7 +138,7 @@ wx.cloud.init({
 
 ### Introduction
 
-**NeverForget** is a WeChat Mini Program that helps families easily record and manage the location of household items. It supports manual/voice input, browsing by space, full-text search, family sharing, and more - making finding things no longer a hassle.
+**TreasureMap** is a WeChat Mini Program that helps families easily record and manage the location of household items. Like a family treasure map, it helps you quickly find where every "treasure" is hidden! It supports manual/voice input, browsing by space, full-text search, family sharing, and more.
 
 ### ✨ Features
 
@@ -162,7 +162,7 @@ wx.cloud.init({
 ### 📁 Project Structure
 
 ```
-neverforget/
+treasuremap/
 ├── miniprogram/                # Mini Program Main
 │   ├── pages/                  # Pages
 │   │   ├── login/              # Login Page
@@ -208,7 +208,7 @@ git clone https://github.com/Luvia233/neverForget.git
 
 1. Download and install [WeChat Developer Tools](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
 2. Open WeChat Developer Tools, select "Import Project"
-3. Select the project directory `neverforget`
+3. Select the project directory `treasuremap`
 4. Enter your AppID (available at [WeChat Public Platform](https://mp.weixin.qq.com/))
 
 #### 3. Configure Cloud Development
