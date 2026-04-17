@@ -72,7 +72,7 @@ treasuremap/
 #### 1. 克隆项目
 
 ```bash
-git clone https://github.com/Luvia233/neverForget.git
+git clone https://github.com/Luvia233/TreasureMap.git
 ```
 
 #### 2. 导入项目
@@ -201,7 +201,7 @@ treasuremap/
 #### 1. Clone the Project
 
 ```bash
-git clone https://github.com/Luvia233/neverForget.git
+git clone https://github.com/Luvia233/TreasureMap.git
 ```
 
 #### 2. Import Project
