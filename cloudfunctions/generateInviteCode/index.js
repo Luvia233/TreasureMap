@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk')
-const { generateInviteCode } = require('../utils/inviteCode')
+const { generateInviteCode: generateCode } = require('../utils/inviteCode')
+const { getUserWithFamily, generateUniqueInviteCode } = require('../utils/common')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -10,41 +11,22 @@ exports.main = async (event, context) => {
     const db = cloud.database()
     const openid = wxContext.openid
 
-    const users = await db.collection('users')
-      .where({ openid: openid })
-      .limit(1)
-      .get()
-
-    if (users.data.length === 0) {
-      return { success: false, error: '用户不存在' }
+    // 使用公共模块获取用户及家庭信息
+    const userResult = await getUserWithFamily(db, openid)
+    if (!userResult.success) {
+      return { success: false, error: userResult.error }
     }
 
-    const user = users.data[0]
-    const familyId = user.family_id
+    const { user, familyId } = userResult
 
     if (user.role !== 'owner') {
       return { success: false, error: '只有房主可以生成邀请码' }
     }
 
-    let newCode
-    let retries = 0
-    const maxRetries = 5
-
-    do {
-      newCode = generateInviteCode(8)
-      const existing = await db.collection('invite_codes')
-        .where({ code: newCode })
-        .limit(1)
-        .get()
-
-      if (existing.data.length === 0) {
-        break
-      }
-      retries++
-    } while (retries < maxRetries)
-
-    if (!newCode) {
-      return { success: false, error: '生成邀请码失败，请重试' }
+    // 使用公共模块生成唯一邀请码
+    const codeResult = await generateUniqueInviteCode(db, generateCode, 8, 5)
+    if (!codeResult.success) {
+      return { success: false, error: codeResult.error }
     }
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -52,7 +34,7 @@ exports.main = async (event, context) => {
     await db.collection('invite_codes').add({
       data: {
         family_id: familyId,
-        code: newCode,
+        code: codeResult.code,
         max_uses: 5,
         used_count: 0,
         expires_at: expiresAt,
@@ -63,7 +45,7 @@ exports.main = async (event, context) => {
     return {
       success: true,
       data: {
-        inviteCode: newCode,
+        inviteCode: codeResult.code,
         expiresAt: expiresAt.toISOString()
       }
     }

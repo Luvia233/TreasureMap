@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk')
+const { checkUserExists, verifyInviteCode } = require('../utils/common')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -6,6 +7,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { inviteCode, nickname } = event
 
+  // 输入校验
   if (!inviteCode || typeof inviteCode !== 'string') {
     return { success: false, error: '请提供邀请码' }
   }
@@ -18,42 +20,23 @@ exports.main = async (event, context) => {
 
   const db = cloud.database()
   const openid = wxContext.openid
-  const upperCode = inviteCode.toUpperCase().trim()
 
   try {
     // 1. 检查用户是否已存在（防止重复加入）
-    const existingUsers = await db.collection('users')
-      .where({ openid: openid })
-      .limit(1)
-      .get()
-
-    if (existingUsers.data.length > 0) {
+    const { exists } = await checkUserExists(db, openid)
+    if (exists) {
       return { success: false, error: '您已经加入过家庭了' }
     }
 
-    // 2. 查找有效的邀请码（原子更新 used_count 时附带条件检查）
-    // 使用 where + update with condition 来实现原子操作
-    const codes = await db.collection('invite_codes')
-      .where({
-        code: upperCode,
-        used_count: db.command.lt(5)
-      })
-      .limit(1)
-      .get()
-
-    if (codes.data.length === 0) {
-      return { success: false, error: '邀请码无效或已过期' }
+    // 2. 验证邀请码
+    const codeResult = await verifyInviteCode(db, inviteCode)
+    if (!codeResult.success) {
+      return { success: false, error: codeResult.error }
     }
 
-    const codeRecord = codes.data[0]
-    const familyId = codeRecord.family_id
+    const { codeRecord, familyId } = codeResult
 
-    // 3. 检查过期时间
-    if (new Date() > new Date(codeRecord.expires_at)) {
-      return { success: false, error: '邀请码已过期' }
-    }
-
-    // 4. 创建用户
+    // 3. 创建用户
     const userRes = await db.collection('users').add({
       data: {
         openid: openid,
@@ -64,7 +47,7 @@ exports.main = async (event, context) => {
       }
     })
 
-    // 5. 更新邀请码使用次数（带条件检查防止超限）
+    // 4. 更新邀请码使用次数（带条件检查防止超限）
     const updateResult = await db.collection('invite_codes')
       .doc(codeRecord._id)
       .update({

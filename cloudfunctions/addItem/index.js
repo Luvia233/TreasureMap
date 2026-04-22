@@ -1,10 +1,13 @@
 const cloud = require('wx-server-sdk')
+const { getUserWithFamily } = require('../utils/common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { name, space, container, position, category, photoUrl } = event
 
+  // 输入校验
   if (!name || typeof name !== 'string' || name.trim().length === 0) {
     return { success: false, error: '请输入物品名称' }
   }
@@ -25,25 +28,21 @@ exports.main = async (event, context) => {
     const db = cloud.database()
     const openid = wxContext.openid
 
-    const users = await db.collection('users')
-      .where({ openid: openid })
-      .limit(1)
-      .get()
-
-    if (users.data.length === 0) {
-      return { success: false, error: '用户不存在' }
+    // 使用公共模块获取用户及家庭信息
+    const userResult = await getUserWithFamily(db, openid)
+    if (!userResult.success) {
+      return { success: false, error: userResult.error }
     }
 
-    const user = users.data[0]
-    const familyId = user.family_id
+    const { user, familyId } = userResult
 
     const itemRes = await db.collection('items').add({
       data: {
         family_id: familyId,
-        name: name,
-        space: space,
-        container: container || '',
-        position: position || '',
+        name: name.trim(),
+        space: space.trim(),
+        container: container ? container.trim() : '',
+        position: position ? position.trim() : '',
         category: category || '',
         photoUrl: photoUrl || '',
         added_by: user.nickname,

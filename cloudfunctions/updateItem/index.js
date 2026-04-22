@@ -1,10 +1,13 @@
 const cloud = require('wx-server-sdk')
+const { getUserWithFamily } = require('../utils/common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { itemId, name, space, container, position, category, photoUrl } = event
 
+  // 输入校验
   if (!itemId || typeof itemId !== 'string') {
     return { success: false, error: '物品ID无效' }
   }
@@ -26,15 +29,22 @@ exports.main = async (event, context) => {
 
   try {
     const db = cloud.database()
+    const openid = wxContext.openid
+
+    // 使用公共模块获取用户及家庭信息
+    const userResult = await getUserWithFamily(db, openid)
+    if (!userResult.success) {
+      return { success: false, error: userResult.error }
+    }
 
     await db.collection('items')
       .doc(itemId)
       .update({
         data: {
-          name: name,
-          space: space,
-          container: container || '',
-          position: position || '',
+          name: name.trim(),
+          space: space.trim(),
+          container: container ? container.trim() : '',
+          position: position ? position.trim() : '',
           category: category || '',
           photoUrl: photoUrl || '',
           updated_at: db.serverDate()

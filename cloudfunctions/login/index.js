@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 exports.main = async (event, context) => {
@@ -7,32 +8,36 @@ exports.main = async (event, context) => {
 
   try {
     const openid = wxContext.openid
-
     const db = cloud.database()
+
     const users = await db.collection('users')
       .where({ openid: openid })
       .limit(1)
       .get()
 
-    let userInfo
-    let userId
-    let familyId
-
     if (users.data.length > 0) {
       const user = users.data[0]
-      userId = user._id
-      familyId = user.family_id
-      userInfo = {
-        nickname: user.nickname,
-        avatar: user.avatar
+      return {
+        success: true,
+        data: {
+          userId: user._id,
+          userInfo: {
+            nickname: user.nickname,
+            avatar: user.avatar || ''
+          },
+          familyId: user.family_id || null
+        }
       }
-    } else {
-      userInfo = { nickname: '新用户', avatar: '' }
     }
 
+    // 新用户，返回明确的 null 值
     return {
       success: true,
-      data: { userId, userInfo, familyId }
+      data: {
+        userId: null,
+        userInfo: { nickname: '新用户', avatar: '' },
+        familyId: null
+      }
     }
 
   } catch (err) {

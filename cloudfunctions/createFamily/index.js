@@ -1,5 +1,6 @@
 const cloud = require('wx-server-sdk')
-const { generateInviteCode } = require('../utils/inviteCode')
+const { generateInviteCode: generateCode } = require('../utils/inviteCode')
+const { generateUniqueInviteCode } = require('../utils/common')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -7,6 +8,7 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { familyName, nickname } = event
 
+  // 输入校验
   if (!familyName || typeof familyName !== 'string' || familyName.trim().length === 0) {
     return { success: false, error: '请输入家庭名称' }
   }
@@ -26,7 +28,7 @@ exports.main = async (event, context) => {
 
     const familyRes = await db.collection('families').add({
       data: {
-        name: familyName,
+        name: familyName.trim(),
         owner_openid: openid,
         created_at: db.serverDate()
       }
@@ -34,25 +36,10 @@ exports.main = async (event, context) => {
 
     const familyId = familyRes._id
 
-    let inviteCode
-    let retries = 0
-    const maxRetries = 5
-
-    do {
-      inviteCode = generateInviteCode(8)
-      const existing = await db.collection('invite_codes')
-        .where({ code: inviteCode })
-        .limit(1)
-        .get()
-
-      if (existing.data.length === 0) {
-        break
-      }
-      retries++
-    } while (retries < maxRetries)
-
-    if (!inviteCode) {
-      return { success: false, error: '生成邀请码失败，请重试' }
+    // 使用公共模块生成唯一邀请码
+    const codeResult = await generateUniqueInviteCode(db, generateCode, 8, 5)
+    if (!codeResult.success) {
+      return { success: false, error: codeResult.error }
     }
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -60,7 +47,7 @@ exports.main = async (event, context) => {
     await db.collection('invite_codes').add({
       data: {
         family_id: familyId,
-        code: inviteCode,
+        code: codeResult.code,
         max_uses: 5,
         used_count: 0,
         expires_at: expiresAt,
@@ -68,10 +55,10 @@ exports.main = async (event, context) => {
       }
     })
 
-    const userRes = await db.collection('users').add({
+    await db.collection('users').add({
       data: {
         openid: openid,
-        nickname: nickname,
+        nickname: nickname.trim(),
         family_id: familyId,
         role: 'owner',
         created_at: db.serverDate()
@@ -80,7 +67,7 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      data: { familyId, userId: userRes._id, inviteCode }
+      data: { familyId, inviteCode: codeResult.code }
     }
 
   } catch (err) {

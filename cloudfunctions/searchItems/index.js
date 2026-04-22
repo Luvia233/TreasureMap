@@ -1,10 +1,13 @@
 const cloud = require('wx-server-sdk')
+const { getUserWithFamily } = require('../utils/common')
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const { keyword, page = 1, pageSize = 20 } = event
 
+  // 输入校验
   if (!keyword || typeof keyword !== 'string') {
     return { success: false, error: '请输入搜索关键词' }
   }
@@ -22,19 +25,15 @@ exports.main = async (event, context) => {
 
   try {
     const db = cloud.database()
-    const _ = db.command
     const openid = wxContext.openid
 
-    const users = await db.collection('users')
-      .where({ openid: openid })
-      .limit(1)
-      .get()
-
-    if (users.data.length === 0) {
-      return { success: false, error: '用户不存在' }
+    // 使用公共模块获取用户及家庭信息
+    const userResult = await getUserWithFamily(db, openid)
+    if (!userResult.success) {
+      return { success: false, error: userResult.error }
     }
 
-    const familyId = users.data[0].family_id
+    const { familyId } = userResult
 
     const items = await db.collection('items')
       .where({
