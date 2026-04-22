@@ -1,0 +1,9 @@
+{
+  "name": "getItemById",
+  "version": "1.0.0",
+  "description": "根据ID获取单个物品",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

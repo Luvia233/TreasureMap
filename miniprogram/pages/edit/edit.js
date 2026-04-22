@@ -26,22 +26,26 @@ Page({
 
   loadItem() {
     wx.cloud.callFunction({
-      name: 'getItems',
-      data: {},
+      name: 'getItemById',
+      data: { itemId: this.data.itemId },
       success: (res) => {
         if (res.result.success) {
-          const item = res.result.data.find(i => i._id === this.data.itemId)
-          if (item) {
-            this.setData({
-              name: item.name,
-              space: item.space,
-              container: item.container || '',
-              position: item.position || '',
-              category: item.category || '',
-              photoUrl: item.photoUrl || ''
-            })
-          }
+          const item = res.result.data
+          this.setData({
+            name: item.name,
+            space: item.space,
+            container: item.container || '',
+            position: item.position || '',
+            category: item.category || '',
+            photoUrl: item.photoUrl || ''
+          })
+        } else {
+          wx.showToast({ title: res.result.error || '加载失败', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
         }
+      },
+      fail: () => {
+        wx.showToast({ title: '加载失败', icon: 'none' })
       }
     })
   },
@@ -80,7 +84,7 @@ Page({
 
   uploadPhoto(filePath) {
     const cloudPath = `items/${Date.now()}-${Math.random().toString(36).substr(2)}.jpg`
-    
+
     wx.cloud.uploadFile({
       cloudPath: cloudPath,
       filePath: filePath,

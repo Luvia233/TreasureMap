@@ -50,7 +50,7 @@ App({
       userId: null,
       hasLogin: false
     }
-    
+
     wx.removeStorageSync('userId')
     wx.removeStorageSync('familyId')
     wx.removeStorageSync('userInfo')

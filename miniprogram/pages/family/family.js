@@ -109,6 +109,7 @@ Page({
   },
 
   loadStats() {
+    // 统计信息已在 loadFamilyInfo 中计算
   },
 
   formatDate(date) {

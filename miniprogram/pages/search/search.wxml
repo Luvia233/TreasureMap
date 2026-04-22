@@ -64,6 +64,11 @@
       <text class="empty-text">没有找到相关物品</text>
       <text class="empty-hint">试试其他关键词</text>
     </view>
+
+    <view wx:if="{{hasMore}}" class="load-more" bindtap="onLoadMore">
+      <text wx:if="{{!isLoadingMore}}" class="load-more-text">加载更多</text>
+      <text wx:else class="load-more-text">加载中...</text>
+    </view>
   </view>
 
   <view wx:if="{{isLoading}}" class="loading-state">

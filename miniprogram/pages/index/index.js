@@ -3,7 +3,8 @@ const app = getApp()
 Page({
   data: {
     spaces: [],
-    isLoading: false
+    isLoading: false,
+    lastLoadTime: 0
   },
 
   onLoad() {
@@ -11,7 +12,11 @@ Page({
   },
 
   onShow() {
-    this.loadData()
+    const now = Date.now()
+    // 如果距上次加载超过 30 秒，或者没有加载过，则重新加载
+    if (!this.data.lastLoadTime || now - this.data.lastLoadTime > 30000) {
+      this.loadData()
+    }
   },
 
   onPullDownRefresh() {
@@ -51,7 +56,8 @@ Page({
           })
 
           const spaces = Object.values(spaceMap)
-          this.setData({ spaces })
+            .sort((a, b) => b.count - a.count) // 按物品数量降序排列
+          this.setData({ spaces, lastLoadTime: Date.now() })
         }
       },
       fail: (err) => {

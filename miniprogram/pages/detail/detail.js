@@ -7,24 +7,27 @@ Page({
   },
 
   onLoad(options) {
+    if (!options.id) {
+      wx.showToast({ title: '物品不存在', icon: 'none' })
+      setTimeout(() => wx.navigateBack(), 1500)
+      return
+    }
     this.setData({ itemId: options.id })
     this.loadItem()
   },
 
   loadItem() {
     wx.cloud.callFunction({
-      name: 'getItems',
-      data: {},
+      name: 'getItemById',
+      data: { itemId: this.data.itemId },
       success: (res) => {
         if (res.result.success) {
-          const item = res.result.data.find(i => i._id === this.data.itemId)
-          if (item) {
-            item.created_at = this.formatDate(item.created_at)
-            this.setData({ item })
-          } else {
-            wx.showToast({ title: '物品不存在', icon: 'none' })
-            setTimeout(() => wx.navigateBack(), 1500)
-          }
+          const item = res.result.data
+          item.created_at = this.formatDate(item.created_at)
+          this.setData({ item })
+        } else {
+          wx.showToast({ title: res.result.error || '加载失败', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
         }
       },
       fail: () => {

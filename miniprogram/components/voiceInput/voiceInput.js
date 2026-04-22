@@ -7,84 +7,109 @@ Component({
   },
 
   data: {
-    isRecording: false
+    isRecording: false,
+    recorderManager: null
+  },
+
+  lifetimes: {
+    attached() {
+      this.initRecorder()
+    }
   },
 
   methods: {
+    initRecorder() {
+      this.recorderManager = wx.getRecorderManager()
+
+      this.recorderManager.onStart(() => {
+        console.log('录音开始')
+      })
+
+      this.recorderManager.onStop((res) => {
+        console.log('录音结束', res)
+        this.setData({ isRecording: false })
+        if (res.tempFilePath) {
+          this.recognizeVoice(res.tempFilePath)
+        }
+      })
+
+      this.recorderManager.onError((err) => {
+        console.error('录音错误', err)
+        this.setData({ isRecording: false })
+        wx.showToast({ title: '录音失败', icon: 'none' })
+      })
+    },
+
     startRecord() {
       const that = this
-      
-      wx.authorize({
-        scope: 'scope.record',
-        success() {
-          that.setData({ isRecording: true })
-          
-          that.recorderManager = wx.getRecorderManager()
-          that.recorderManager.onStart(() => {
-            console.log('录音开始')
-          })
-          that.recorderManager.onStop((res) => {
-            console.log('录音结束', res)
-            that.setData({ isRecording: false })
-            that.recognizeVoice(res.tempFilePath)
-          })
-          that.recorderManager.onError((err) => {
-            console.error('录音错误', err)
-            that.setData({ isRecording: false })
-            wx.showToast({ title: '录音失败', icon: 'none' })
-          })
-          
-          that.recorderManager.start({
-            format: 'mp3',
-            duration: 60000
-          })
-        },
-        fail() {
-          wx.showModal({
-            title: '需要授权',
-            content: '请授权使用麦克风功能',
-            confirmText: '去设置',
-            success(res) {
-              if (res.confirm) {
-                wx.openSetting()
+
+      wx.getSetting({
+        success(res) {
+          if (!res.authSetting['scope.record']) {
+            wx.authorize({
+              scope: 'scope.record',
+              success() {
+                that.doStartRecord()
+              },
+              fail() {
+                wx.showModal({
+                  title: '需要授权',
+                  content: '请授权使用麦克风功能',
+                  confirmText: '去设置',
+                  success(res) {
+                    if (res.confirm) {
+                      wx.openSetting()
+                    }
+                  }
+                })
               }
-            }
-          })
+            })
+          } else {
+            that.doStartRecord()
+          }
         }
       })
     },
 
+    doStartRecord() {
+      if (!this.recorderManager) {
+        this.initRecorder()
+      }
+
+      this.setData({ isRecording: true })
+
+      this.recorderManager.start({
+        format: 'mp3',
+        duration: 60000,
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 48000
+      })
+    },
+
     stopRecord() {
-      if (this.recorderManager) {
+      if (this.recorderManager && this.data.isRecording) {
         this.recorderManager.stop()
       }
     },
 
     recognizeVoice(filePath) {
-      const that = this
-      
       wx.showLoading({ title: '识别中...' })
-      
-      wx.uploadFile({
-        url: 'https://api.weixin.qq.com/cgi-bin/media/voice/addvoicedata',
-        filePath: filePath,
-        name: 'voice',
-        success(res) {
+
+      wx.cloud.callFunction({
+        name: 'voiceRecognition',
+        data: { filePath },
+        success: (res) => {
           wx.hideLoading()
-          try {
-            const data = JSON.parse(res.data)
-            if (data.result) {
-              that.triggerEvent('result', { text: data.result })
-            } else {
-              wx.showToast({ title: '识别失败', icon: 'none' })
-            }
-          } catch (e) {
+          if (res.result && res.result.success && res.result.text) {
+            this.triggerEvent('result', { text: res.result.text })
+          } else {
             wx.showToast({ title: '识别失败', icon: 'none' })
           }
         },
-        fail(err) {
+        fail: (err) => {
           wx.hideLoading()
-          console.error('上传失败', err)
+          console.error('识别失败', err)
           wx.showToast({ title: '识别失败', icon: 'none' })
         }
       })
