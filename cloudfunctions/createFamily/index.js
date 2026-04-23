@@ -65,9 +65,16 @@ exports.main = async (event, context) => {
       }
     })
 
+    const userRes = await db.collection('users')
+      .where({ openid: openid })
+      .limit(1)
+      .get()
+
+    const userId = userRes.data[0]._id
+
     return {
       success: true,
-      data: { familyId, inviteCode: codeResult.code }
+      data: { familyId, userId, inviteCode: codeResult.code }
     }
 
   } catch (err) {

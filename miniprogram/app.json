@@ -24,27 +24,19 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home-active.png"
+        "text": "首页"
       },
       {
         "pagePath": "pages/search/search",
-        "text": "搜索",
-        "iconPath": "images/search.png",
-        "selectedIconPath": "images/search-active.png"
+        "text": "搜索"
       },
       {
         "pagePath": "pages/add/add",
-        "text": "添加",
-        "iconPath": "images/add.png",
-        "selectedIconPath": "images/add-active.png"
+        "text": "添加"
       },
       {
         "pagePath": "pages/family/family",
-        "text": "家庭",
-        "iconPath": "images/family.png",
-        "selectedIconPath": "images/family-active.png"
+        "text": "家庭"
       }
     ]
   },
